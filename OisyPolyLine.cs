@@ -37,8 +37,6 @@ public class OisyPolyLine : MonoBehaviour {
 	[SerializeField]
 	Material material;
 
-
-
 	[System.Serializable]
 	public class Line{
 		public float timeStamp;
@@ -50,6 +48,12 @@ public class OisyPolyLine : MonoBehaviour {
 	List<Line> lineList;
 	GameObject polyLineObject;
 	Mesh mesh;
+
+	/// <summary>
+	/// UVを適用する最初の座標を決めるためのスイッチ
+	/// 毎フレーム切り替わる
+	/// </summary>
+	bool toggle = false;
 
 	// Use this for initialization
 	void Start () {
@@ -91,6 +95,9 @@ public class OisyPolyLine : MonoBehaviour {
 
 		if(lineList.Count > 0)
 			ApplyMesh();
+
+		//次フレームのUV開始位置を切り替え.
+		toggle = !toggle;
 	}
 
 	/// <summary>
@@ -144,7 +151,7 @@ public class OisyPolyLine : MonoBehaviour {
 			newColors[1 + (i * 2)].a *= lineList[i].alpha;
 
 			//UVの設定(ラインごとに反復運動するようなUVを設定する).
-			if(i%2 == 0){
+			if((!toggle && i%2 == 0) || (toggle && i%2 == 1)){
 				newUV[i * 2] = new Vector2(0, 0);
 				newUV[1 + (i * 2)] = new Vector2(0, 1);
 			}
@@ -153,9 +160,9 @@ public class OisyPolyLine : MonoBehaviour {
 				newUV[1 + (i * 2)] = new Vector2(1, 1);
 			}
 
-			//float uvRatio = (float)n/pointsToUse.Count;
-			//newUV[n * 2] = new Vector2(uvRatio, 0);
-			//newUV[(n * 2) + 1] = new Vector2(uvRatio, 1);
+			//float uvRatio = (float)i/pointsToUse.Count;
+			//newUV[i * 2] = new Vector2(uvRatio, 0);
+			//newUV[(i * 2) + 1] = new Vector2(uvRatio, 1);
 
 			//iが1以上(三角ポリが二つ張れる状態)ならTriAnglesを設定.
 			if (i > 0)
